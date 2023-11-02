@@ -29,9 +29,22 @@ void compile_add(int var) {
 	printf("addq %d(%%rsp), %%rax\n", - var * 8 - 8);
 }
 
+void compile_label(int label) {
+	printf("L%d:\n", label);
+}
+
+void compile_jump(int label) {
+	printf("jmp L%d\n", label);
+}
+
+void compile_jump_if_zero(int label) {
+	printf("jz L%d\n", label);
+}
+
 
 int local_var_alloc = 0;
 int tmp_alloc = 2;
+int label_alloc = 0;
 
 void compile(Ast::Expr const& a) {
 	using Tag = Ast::Expr::Tag;
@@ -67,6 +80,18 @@ void compile(Ast::Stmt const& a) {
 	case Tag::Noop: {
 		// nothing to do
 	} break;
+	case Tag::IfElse: {
+		auto const& e = static_cast<Ast::IfElse const&>(a);
+		compile(e.condition());
+		int false_label = label_alloc++;
+		int end_label = label_alloc++;
+		compile_jump_if_zero(false_label);
+		compile(e.true_branch());
+		compile_jump(end_label);
+		compile_label(false_label);
+		compile(e.false_branch());
+		compile_label(end_label);
+	} break;
 	}
 }
 
@@ -77,7 +102,11 @@ int main() {
 	int b = local_var_alloc++;
 
 	// a = a + 10 + b
-	auto assnt = Assignment{a, new Add{new Add{new Var{a}, new Num{10}}, new Var{b}}};
+	auto stmt = IfElse {
+		new Add{new Var{a}, new Var{b}},
+		new Assignment{a, new Add{new Add{new Var{a}, new Num{10}}, new Var{b}}},
+		new Assignment{a, new Num{7}}
+	};
 
-	compile(assnt);
+	compile(stmt);
 }
