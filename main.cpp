@@ -55,10 +55,19 @@ void compile(Ast::Expr const& a) {
 	}
 }
 
-void compile(Ast::Assignment const& a) {
-	tmp_alloc = local_var_alloc;
-	compile(a.expr());
-	compile_store(a.slot());
+void compile(Ast::Stmt const& a) {
+	using Tag = Ast::Stmt::Tag;
+	switch(a.tag()) {
+	case Tag::Assignment: {
+		auto const& e = static_cast<Ast::Assignment const&>(a);
+		tmp_alloc = local_var_alloc;
+		compile(e.expr());
+		compile_store(e.slot());
+	} break;
+	case Tag::Noop: {
+		// nothing to do
+	} break;
+	}
 }
 
 int main() {
