@@ -1,45 +1,60 @@
 #pragma once
 
+#include <cassert>
+
 namespace Ast {
 
-struct Node {
+struct Expr {
 	enum class Tag { Add, Var, Num };
-	Node(Tag tag) : m_tag{tag} {}
+	Expr(Tag tag) : m_tag{tag} {}
 	Tag tag() const { return m_tag; }
 private:
 	Tag m_tag;
 };
 
-struct Add : Node {
-	Add(Node* lhs, Node* rhs) : Node{Tag::Add}, m_lhs{lhs}, m_rhs{rhs} {}
-	Node* lhs() const { return m_lhs; }
-	Node* rhs() const { return m_rhs; }
+struct Add : Expr {
+	Add(Expr* lhs, Expr* rhs)
+	: Expr{Tag::Add}
+	, m_lhs{lhs}
+	, m_rhs{rhs} {
+		assert(lhs != nullptr);
+		assert(rhs != nullptr);
+	}
+	Expr& lhs() { return *m_lhs; }
+	Expr& rhs() { return *m_rhs; }
+	Expr const& lhs() const { return *m_lhs; }
+	Expr const& rhs() const { return *m_rhs; }
 private:
-	Node* m_lhs;
-	Node* m_rhs;
+	Expr* m_lhs;
+	Expr* m_rhs;
 };
 
-struct Num : Node {
-	Num(int value) : Node{Tag::Num}, m_value{value} {}
+struct Num : Expr {
+	Num(int value) : Expr{Tag::Num}, m_value{value} {}
 	int value() const { return m_value; }
 private:
 	int m_value;
 };
 
-struct Var : Node {
-	Var(int slot) : Node{Tag::Var}, m_slot{slot} {}
+struct Var : Expr {
+	Var(int slot) : Expr{Tag::Var}, m_slot{slot} {}
 	int slot() const { return m_slot; }
 private:
 	int m_slot;
 };
 
 struct Assignment {
-	Assignment(int slot, Node* expr) : m_slot{slot}, m_expr{expr} {}
+	Assignment(int slot, Expr* expr)
+	: m_slot{slot}
+	, m_expr{expr} {
+		assert(expr != nullptr);
+	}
 	int slot() const { return m_slot; }
-	Node* expr() const { return m_expr; }
+	Expr& expr() { return *m_expr; }
+	Expr const& expr() const { return *m_expr; }
 private:
 	int m_slot;
-	Node* m_expr;
+	Expr* m_expr;
 };
 
 } // namespace Ast

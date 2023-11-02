@@ -33,24 +33,24 @@ void compile_add(int var) {
 int local_var_alloc = 0;
 int tmp_alloc = 2;
 
-void compile(Ast::Node* a) {
-	using Tag = Ast::Node::Tag;
-	switch (a->tag()) {
+void compile(Ast::Expr const& a) {
+	using Tag = Ast::Expr::Tag;
+	switch (a.tag()) {
 	case Tag::Add: {
-		auto e = static_cast<Ast::Add*>(a);
-		compile(e->lhs());
+		auto const& e = static_cast<Ast::Add const&>(a);
+		compile(e.lhs());
 		int lhs_var = tmp_alloc++;
 		compile_store(lhs_var);
-		compile(e->rhs());
+		compile(e.rhs());
 		compile_add(lhs_var);
 	} break;
 	case Tag::Num: {
-		auto e = static_cast<Ast::Num*>(a);
-		compile_load_const(e->value());
+		auto const& e = static_cast<Ast::Num const&>(a);
+		compile_load_const(e.value());
 	} break;
 	case Tag::Var: {
-		auto e = static_cast<Ast::Var*>(a);
-		compile_load(e->slot());
+		auto const& e = static_cast<Ast::Var const&>(a);
+		compile_load(e.slot());
 	} break;
 	}
 }
