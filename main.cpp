@@ -4,10 +4,13 @@
 
 // Lenguaje chiquito:
 //
-// A := x '=' E                  [asignación]
-// E := n | x | E + E            [expresión]
-// n := '1' | '2' | '3' | ...    [número]
-// x := 'a' | 'b' | 'c' | ...    [variable]
+// S ::= A | C | N                          [sentencia]
+// C ::= 'if' E 'then' S 'else' S           [condicional]
+// A ::= x '=' E                            [asignación]
+// N ::= 'skip'                             [no-op]
+// E ::= n | x | E + E                      [expresión]
+// n ::= '1' | '2' | '3' | ...              [número]
+// x ::= 'a' | 'b' | 'c' | ...              [variable]
 //
 // Compilamos a x86-64 (textual, estilo AT&T). Al compilar una expresión, su
 // resultado queda en %rax, que cumple el rol de acumulador. Si hace falta
