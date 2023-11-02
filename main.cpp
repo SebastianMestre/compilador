@@ -4,10 +4,11 @@
 
 // Lenguaje chiquito:
 //
-// S ::= A | C | N                          [sentencia]
+// S ::= A | C | N | B                      [sentencia]
 // C ::= 'if' E 'then' S 'else' S           [condicional]
 // A ::= x '=' E                            [asignación]
 // N ::= 'skip'                             [no-op]
+// B ::= 'while' E 'do' S                   [bucle]
 // E ::= n | x | E + E                      [expresión]
 // n ::= '1' | '2' | '3' | ...              [número]
 // x ::= 'a' | 'b' | 'c' | ...              [variable]
@@ -115,7 +116,13 @@ int main() {
 	int a = local_var_alloc++;
 	int b = local_var_alloc++;
 
-	// a = a + 10 + b
+	// while a
+	// do
+	//   if a + b
+	//   then
+	//     a = a + 10 + b
+	//   else
+	//     a = 7
 	auto stmt = While{
 		new Var{a},
 		new IfElse {
