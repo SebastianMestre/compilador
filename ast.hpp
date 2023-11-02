@@ -43,9 +43,18 @@ private:
 	int m_slot;
 };
 
-struct Assignment {
+struct Stmt {
+	enum class Tag { Assignment };
+	Stmt(Tag tag) : m_tag{tag} {}
+	Tag tag() const { return m_tag; }
+private:
+	Tag m_tag;
+};
+
+struct Assignment : Stmt {
 	Assignment(int slot, Expr* expr)
-	: m_slot{slot}
+	: Stmt{Tag::Assignment}
+	, m_slot{slot}
 	, m_expr{expr} {
 		assert(expr != nullptr);
 	}
