@@ -44,7 +44,7 @@ private:
 };
 
 struct Stmt {
-	enum class Tag { Assignment };
+	enum class Tag { Assignment, Noop };
 	Stmt(Tag tag) : m_tag{tag} {}
 	Tag tag() const { return m_tag; }
 private:
@@ -64,6 +64,10 @@ struct Assignment : Stmt {
 private:
 	int m_slot;
 	Expr* m_expr;
+};
+
+struct Noop : Stmt {
+	Noop() : Stmt{Tag::Noop} {}
 };
 
 } // namespace Ast
