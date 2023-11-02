@@ -95,6 +95,17 @@ void compile(Ast::Stmt const& a) {
 		compile(e.false_branch());
 		compile_label(end_label);
 	} break;
+	case Tag::While: {
+		auto const& e = static_cast<Ast::While const&>(a);
+		int start_label = label_alloc++;
+		int end_label = label_alloc++;
+		compile_label(start_label);
+		compile(e.condition());
+		compile_jump_if_zero(end_label);
+		compile(e.body());
+		compile_jump(start_label);
+		compile_label(end_label);
+	} break;
 	}
 }
 
@@ -105,10 +116,13 @@ int main() {
 	int b = local_var_alloc++;
 
 	// a = a + 10 + b
-	auto stmt = IfElse {
-		new Add{new Var{a}, new Var{b}},
-		new Assignment{a, new Add{new Add{new Var{a}, new Num{10}}, new Var{b}}},
-		new Assignment{a, new Num{7}}
+	auto stmt = While{
+		new Var{a},
+		new IfElse {
+			new Add{new Var{a}, new Var{b}},
+			new Assignment{a, new Add{new Add{new Var{a}, new Num{10}}, new Var{b}}},
+			new Assignment{a, new Num{7}}
+		}
 	};
 
 	compile(stmt);
