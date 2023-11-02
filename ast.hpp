@@ -44,7 +44,7 @@ private:
 };
 
 struct Stmt {
-	enum class Tag { Assignment, Noop };
+	enum class Tag { Assignment, Noop, IfElse };
 	Stmt(Tag tag) : m_tag{tag} {}
 	Tag tag() const { return m_tag; }
 private:
@@ -68,6 +68,28 @@ private:
 
 struct Noop : Stmt {
 	Noop() : Stmt{Tag::Noop} {}
+};
+
+struct IfElse : Stmt {
+	IfElse(Expr* condition, Stmt* true_branch, Stmt* false_branch)
+	: Stmt{Tag::IfElse}
+	, m_condition{condition}
+	, m_true_branch{true_branch}
+	, m_false_branch{false_branch} {
+		assert(m_condition != nullptr);
+		assert(m_true_branch != nullptr);
+		assert(m_false_branch != nullptr);
+	}
+	Expr& condition() { return *m_condition; }
+	Stmt& true_branch() { return *m_true_branch; }
+	Stmt& false_branch() { return *m_false_branch; }
+	Expr const& condition() const { return *m_condition; }
+	Stmt const& true_branch() const { return *m_true_branch; }
+	Stmt const& false_branch() const { return *m_false_branch; }
+private:
+	Expr* m_condition;
+	Stmt* m_true_branch;
+	Stmt* m_false_branch;
 };
 
 } // namespace Ast
