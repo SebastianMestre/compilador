@@ -116,6 +116,11 @@ void compile(Ast::Stmt const& a) {
 		compile(e.expr());
 		compile_return();
 	} break;
+	case Tag::Seq: {
+		auto const& e = static_cast<Ast::Seq const&>(a);
+		compile(e.fst());
+		compile(e.snd());
+	} break;
 	}
 }
 
