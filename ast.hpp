@@ -44,7 +44,7 @@ private:
 };
 
 struct Stmt {
-	enum class Tag { Assignment, Noop, IfElse, While };
+	enum class Tag { Assignment, Noop, IfElse, While, Return };
 	Stmt(Tag tag) : m_tag{tag} {}
 	Tag tag() const { return m_tag; }
 private:
@@ -107,6 +107,18 @@ struct While : Stmt {
 private:
 	Expr* m_condition;
 	Stmt* m_body;
+};
+
+struct Return : Stmt {
+	Return(Expr* expr)
+	: Stmt{Tag::Return}
+	, m_expr{expr} {
+		assert(expr != nullptr);
+	}
+	Expr& expr() { return *m_expr; }
+	Expr const& expr() const { return *m_expr; }
+private:
+	Expr* m_expr;
 };
 
 } // namespace Ast
