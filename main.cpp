@@ -46,6 +46,9 @@ void compile_jump_if_zero(int label) {
 	printf("jz L%d\n", label);
 }
 
+void compile_return() {
+	printf("ret\n");
+}
 
 int local_var_alloc = 0;
 int tmp_alloc = 2;
@@ -107,6 +110,11 @@ void compile(Ast::Stmt const& a) {
 		compile(e.body());
 		compile_jump(start_label);
 		compile_label(end_label);
+	} break;
+	case Tag::Return: {
+		auto const& e = static_cast<Ast::Return const&>(a);
+		compile(e.expr());
+		compile_return();
 	} break;
 	}
 }
