@@ -42,6 +42,7 @@ void compile_jump(int label) {
 }
 
 void compile_jump_if_zero(int label) {
+	printf("test %%rax, %%rax\n");
 	printf("jz L%d\n", label);
 }
 
