@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <cassert>
 
 namespace Ast {
@@ -136,6 +138,21 @@ struct Seq : Stmt {
 private:
 	Stmt* m_fst;
 	Stmt* m_snd;
+};
+
+struct Func {
+	Func(std::string name, Stmt* body)
+	: m_name{std::move(name)}
+	, m_body{body} {
+		assert(body != nullptr);
+	}
+	std::string& name() { return m_name; }
+	Stmt& body() { return *m_body; }
+	std::string const& name() const { return m_name; }
+	Stmt const& body() const { return *m_body; }
+private:
+	std::string m_name;
+	Stmt* m_body;
 };
 
 } // namespace Ast
