@@ -1,6 +1,6 @@
-#include <cstdio>
-
 #include "ast.hpp"
+
+#include <cstdio>
 
 // Lenguaje chiquito:
 //
@@ -44,6 +44,10 @@ void compile_jump(int label) {
 void compile_jump_if_zero(int label) {
 	printf("test %%rax, %%rax\n");
 	printf("jz L%d\n", label);
+}
+
+void compile_named_label(std::string const& s) {
+	printf("%s:\n", s.c_str());
 }
 
 void compile_return() {
@@ -124,27 +128,42 @@ void compile(Ast::Stmt const& a) {
 	}
 }
 
+void compile(Ast::Func const& a) {
+	compile_named_label(a.name());
+	compile(a.body());
+}
+
 int main() {
 	using namespace Ast;
 
 	int a = local_var_alloc++;
 	int b = local_var_alloc++;
 
-	// while a
-	// do
-	//   if a + b
-	//   then
-	//     a = a + 10 + b
-	//   else
-	//     a = 7
-	auto stmt = While{
-		new Var{a},
-		new IfElse {
-			new Add{new Var{a}, new Var{b}},
-			new Assignment{a, new Add{new Add{new Var{a}, new Num{10}}, new Var{b}}},
-			new Assignment{a, new Num{7}}
+	// fun pepe()
+	//   while a
+	//   do
+	//     if a + b
+	//     then
+	//       a = a + 10 + b
+	//     else
+	//       a = 7
+	//     end
+	//   end
+	// end
+	auto fun = Func{
+		"pepe",
+		new Seq{
+			new While{
+				new Var{a},
+				new IfElse{
+					new Add{new Var{a}, new Var{b}},
+					new Assignment{a, new Add{new Add{new Var{a}, new Num{10}}, new Var{b}}},
+					new Assignment{a, new Num{7}}
+				}
+			},
+			new Return{new Var{a}}
 		}
 	};
 
-	compile(stmt);
+	compile(fun);
 }
