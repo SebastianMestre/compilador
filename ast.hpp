@@ -44,7 +44,7 @@ private:
 };
 
 struct Stmt {
-	enum class Tag { Assignment, Noop, IfElse, While, Return };
+	enum class Tag { Assignment, Noop, IfElse, While, Return, Seq };
 	Stmt(Tag tag) : m_tag{tag} {}
 	Tag tag() const { return m_tag; }
 private:
@@ -119,6 +119,23 @@ struct Return : Stmt {
 	Expr const& expr() const { return *m_expr; }
 private:
 	Expr* m_expr;
+};
+
+struct Seq : Stmt {
+	Seq(Stmt* fst, Stmt* snd)
+	: Stmt{Tag::Seq}
+	, m_fst{fst}
+	, m_snd{snd} {
+		assert(fst != nullptr);
+		assert(snd != nullptr);
+	}
+	Stmt& fst() { return *m_fst; }
+	Stmt& snd() { return *m_snd; }
+	Stmt const& fst() const { return *m_fst; }
+	Stmt const& snd() const { return *m_snd; }
+private:
+	Stmt* m_fst;
+	Stmt* m_snd;
 };
 
 } // namespace Ast
