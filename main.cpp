@@ -143,16 +143,17 @@ int main() {
 	int b = local_var_alloc++;
 	int c = local_var_alloc++;
 
-	// fun pepe()
-	//   while a
+	// fun fib(arg)
+	//   a = 0
+	//   b = 1
+	//   while arg
 	//   do
-	//     if a + b
-	//     then
-	//       a = a + 10 + b
-	//     else
-	//       a = 7
-	//     end
+	//     c = a + b
+	//     a = b
+	//     b = c
+	//     arg = arg + (-1)
 	//   end
+	//   return b
 	// end
 	auto fun = Func{
 		"fib",
