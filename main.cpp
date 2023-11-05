@@ -130,6 +130,8 @@ void compile(Ast::Stmt const& a) {
 
 void compile(Ast::Func const& a) {
 	compile_named_label(a.name());
+	printf("mov %%rdi, %%rax\n");
+	compile_store(0);
 	compile(a.body());
 }
 
