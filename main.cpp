@@ -138,8 +138,10 @@ void compile(Ast::Func const& a) {
 int main() {
 	using namespace Ast;
 
+	int arg = local_var_alloc++;
 	int a = local_var_alloc++;
 	int b = local_var_alloc++;
+	int c = local_var_alloc++;
 
 	// fun pepe()
 	//   while a
@@ -153,18 +155,19 @@ int main() {
 	//   end
 	// end
 	auto fun = Func{
-		"pepe",
-		new Seq{
-			new While{
-				new Var{a},
-				new IfElse{
-					new Add{new Var{a}, new Var{b}},
-					new Assignment{a, new Add{new Add{new Var{a}, new Num{10}}, new Var{b}}},
-					new Assignment{a, new Num{7}}
-				}
-			},
-			new Return{new Var{a}}
-		}
+		"fib",
+		new Seq{new Seq{new Seq{
+		new Assignment{a, new Num{0}},
+		new Assignment{b, new Num{1}}},
+		new  While{
+			new Var{arg},
+			new Seq{new Seq{new Seq{
+			new Assignment{c, new Add{new Var{a}, new Var{b}}},
+			new Assignment{a, new Var{b}}},
+			new Assignment{b, new Var{c}}},
+			new Assignment{arg, new Add{new Var{arg}, new Num{-1}}}}
+		}},
+		new Return{new Var{b}}}
 	};
 
 	compile(fun);
