@@ -126,6 +126,7 @@ void compile(Ast::Stmt const& a) {
 	} break;
 	case Tag::IfElse: {
 		auto const& e = static_cast<Ast::IfElse const&>(a);
+		tmp_alloc = local_var_alloc;
 		compile(e.condition());
 		int false_label = label_alloc++;
 		int end_label = label_alloc++;
@@ -138,6 +139,7 @@ void compile(Ast::Stmt const& a) {
 	} break;
 	case Tag::While: {
 		auto const& e = static_cast<Ast::While const&>(a);
+		tmp_alloc = local_var_alloc;
 		int start_label = label_alloc++;
 		int end_label = label_alloc++;
 		compile_label(start_label);
@@ -149,6 +151,7 @@ void compile(Ast::Stmt const& a) {
 	} break;
 	case Tag::Return: {
 		auto const& e = static_cast<Ast::Return const&>(a);
+		tmp_alloc = local_var_alloc;
 		compile(e.expr());
 		compile_return();
 	} break;
