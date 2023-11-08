@@ -7,7 +7,7 @@
 namespace Ast {
 
 struct Expr {
-	enum class Tag { Add, Var, Num };
+	enum class Tag { Add, Var, Num, Deref };
 	Expr(Tag tag) : m_tag{tag} {}
 	Tag tag() const { return m_tag; }
 private:
@@ -43,6 +43,16 @@ struct Var : Expr {
 	int slot() const { return m_slot; }
 private:
 	int m_slot;
+};
+
+struct Deref : Expr {
+	Deref(Expr* expr) : Expr{Tag::Deref}, m_expr{expr} {
+		assert(expr != nullptr);
+	}
+	Expr& expr() { return *m_expr; }
+	Expr const& expr() const { return *m_expr; }
+private:
+	Expr* m_expr;
 };
 
 struct Stmt {
