@@ -118,8 +118,13 @@ void compile(Ast::Stmt const& a) {
 	case Tag::Assignment: {
 		auto const& e = static_cast<Ast::Assignment const&>(a);
 		tmp_alloc = local_var_alloc;
+		compile_address(e.target());
+		int slot = tmp_alloc++;
+		compile_store(slot);
 		compile(e.expr());
-		compile_store(e.slot());
+		printf("movq %%rax, %%rbx\n");
+		compile_load(slot);
+		printf("movq %%rbx, (%%rax)\n");
 	} break;
 	case Tag::Noop: {
 		// nothing to do
