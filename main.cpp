@@ -1,6 +1,7 @@
 #include "ast.hpp"
 
 #include <cstdio>
+#include <cstdlib>
 
 // Lenguaje chiquito:
 //
@@ -23,6 +24,10 @@ void compile_store(int var) {
 
 void compile_load(int var) {
 	printf("movq %d(%%rsp), %%rax\n", - var * 8 - 8);
+}
+
+void compile_load_address(int var) {
+	printf("leaq %d(%%rsp), %%rax\n", - var * 8 - 8);
 }
 
 void compile_load_const(int value) {
@@ -85,6 +90,24 @@ void compile(Ast::Expr const& a) {
 		auto const& e = static_cast<Ast::Deref const&>(a);
 		compile(e.expr());
 		compile_deref();
+	} break;
+	}
+}
+
+void compile_address(Ast::Expr const& a) {
+	using Tag = Ast::Expr::Tag;
+	switch (a.tag()) {
+	case Tag::Var: {
+		auto const& e = static_cast<Ast::Var const&>(a);
+		compile_load_address(e.slot());
+	} break;
+	case Tag::Deref: {
+		auto const& e = static_cast<Ast::Deref const&>(a);
+		compile(e.expr());
+	} break;
+	default: {
+		fprintf(stderr, "Asked for the address of a non l-value\n");
+		exit(1);
 	} break;
 	}
 }
