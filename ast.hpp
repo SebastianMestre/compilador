@@ -65,16 +65,24 @@ private:
 
 struct Assignment : Stmt {
 	Assignment(int slot, Expr* expr)
+	: Assignment{new Var{slot}, expr} {}
+	Assignment(Expr* target, Expr* expr)
 	: Stmt{Tag::Assignment}
-	, m_slot{slot}
+	, m_target{target}
 	, m_expr{expr} {
+		assert(target != nullptr);
 		assert(expr != nullptr);
 	}
-	int slot() const { return m_slot; }
+	int slot() const {
+		assert(m_target->tag() == Expr::Tag::Var);
+		return static_cast<Var*>(m_target)->slot();
+	}
+	Expr& target() { return *m_target; }
+	Expr const& target() const { return *m_target; }
 	Expr& expr() { return *m_expr; }
 	Expr const& expr() const { return *m_expr; }
 private:
-	int m_slot;
+	Expr* m_target;
 	Expr* m_expr;
 };
 
