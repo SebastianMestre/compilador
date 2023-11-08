@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 // Lenguaje chiquito:
 //
@@ -175,41 +176,83 @@ void compile(Ast::Func const& a) {
 	compile(a.body());
 }
 
-int main() {
+int main(int argc, char** argv) {
+	if (argc != 2) {
+		fprintf(stderr, "Usage: ./main <test name>\n");
+		return EXIT_FAILURE;
+	}
+
 	using namespace Ast;
 
-	int arg = local_var_alloc++;
-	int a = local_var_alloc++;
-	int b = local_var_alloc++;
-	int c = local_var_alloc++;
+	char const* test_name = argv[1];
 
-	// fun fib(arg)
-	//   a = 0
-	//   b = 1
-	//   while arg
-	//   do
-	//     c = a + b
-	//     a = b
-	//     b = c
-	//     arg = arg + (-1)
-	//   end
-	//   return b
-	// end
-	auto fun = Func{
-		"fib",
-		new Seq{new Seq{new Seq{
-		new Assignment{a, new Num{0}},
-		new Assignment{b, new Num{1}}},
-		new  While{
-			new Var{arg},
-			new Seq{new Seq{new Seq{
-			new Assignment{c, new Add{new Var{a}, new Var{b}}},
-			new Assignment{a, new Var{b}}},
-			new Assignment{b, new Var{c}}},
-			new Assignment{arg, new Add{new Var{arg}, new Num{-1}}}}
-		}},
-		new Return{new Var{b}}}
-	};
+	if (!strcmp(test_name, "fib")) {
 
-	compile(fun);
+		int arg = local_var_alloc++;
+		int a = local_var_alloc++;
+		int b = local_var_alloc++;
+		int c = local_var_alloc++;
+
+		// fun fib(arg)
+		//   a = 0
+		//   b = 1
+		//   while arg
+		//   do
+		//     c = a + b
+		//     a = b
+		//     b = c
+		//     arg = arg + (-1)
+		//   end
+		//   return b
+		// end
+		auto fun = Func{
+			"fib",
+				new Seq{new Seq{new Seq{
+					new Assignment{a, new Num{0}},
+					new Assignment{b, new Num{1}}},
+				new  While{
+					new Var{arg},
+					new Seq{new Seq{new Seq{
+						new Assignment{c, new Add{new Var{a}, new Var{b}}},
+						new Assignment{a, new Var{b}}},
+					new Assignment{b, new Var{c}}},
+					new Assignment{arg, new Add{new Var{arg}, new Num{-1}}}}
+				}},
+				new Return{new Var{b}}}
+		};
+
+		compile(fun);
+
+	} else if (!strcmp(test_name, "read_next_value")) {
+
+		int arg = local_var_alloc++;
+#if 1
+		int nxt = local_var_alloc++;
+		int nxt_val = local_var_alloc++;
+		// nxt = *(arg + 8)
+		// nxt_val = *nxt
+		// return nxt_val
+		auto fun = Func{
+			"read_next_value",
+				new Seq{new Seq{
+					new Assignment{nxt, new Deref{new Add{new Var{arg}, new Num{8}}}},
+					new Assignment{nxt_val, new Deref{new Var{nxt}}}},
+				new Return{new Var{nxt_val}}}
+		};
+#else
+
+		auto fun = Func{
+			"read_next_value",
+				new Return{new Deref{new Deref{new Add{new Var{arg}, new Num{8}}}}}
+		};
+
+#endif
+		compile(fun);
+
+	} else {
+		fprintf(stderr, "Invalid test name: '%s'\n", test_name);
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
 }
