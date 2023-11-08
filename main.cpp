@@ -54,6 +54,10 @@ void compile_return() {
 	printf("ret\n");
 }
 
+void compile_deref() {
+	printf("mov (%%rax), %%rax\n");
+}
+
 int local_var_alloc = 0;
 int tmp_alloc = 2;
 int label_alloc = 0;
@@ -76,6 +80,11 @@ void compile(Ast::Expr const& a) {
 	case Tag::Var: {
 		auto const& e = static_cast<Ast::Var const&>(a);
 		compile_load(e.slot());
+	} break;
+	case Tag::Deref: {
+		auto const& e = static_cast<Ast::Deref const&>(a);
+		compile(e.expr());
+		compile_deref();
 	} break;
 	}
 }
