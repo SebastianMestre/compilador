@@ -117,11 +117,18 @@ void compile(Ast::Stmt const& a) {
 	switch(a.tag()) {
 	case Tag::Assignment: {
 		auto const& e = static_cast<Ast::Assignment const&>(a);
-		compile_address(e.target());
-		printf("push %%rax\n");
-		compile(e.expr());
-		printf("pop %%rcx\n");
-		printf("movq %%rax, (%%rcx)\n");
+		if (e.target().tag() == Ast::Expr::Tag::Var) {
+			auto const& target = static_cast<Ast::Var const&>(e.target());
+			int var = target.slot();
+			compile(e.expr());
+			compile_store(var);
+		} else {
+			compile_address(e.target());
+			printf("push %%rax\n");
+			compile(e.expr());
+			printf("pop %%rcx\n");
+			printf("movq %%rax, (%%rcx)\n");
+		}
 	} break;
 	case Tag::Noop: {
 		// nothing to do
