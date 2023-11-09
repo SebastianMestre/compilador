@@ -20,15 +20,15 @@
 // guardamos los resultados intermedios en la pila.
 
 void compile_store(int var) {
-	printf("movq %%rax, %d(%%rsp)\n", - var * 8 - 8);
+	printf("movq %%rax, %d(%%rbp)\n", - var * 8 - 8);
 }
 
 void compile_load(int var) {
-	printf("movq %d(%%rsp), %%rax\n", - var * 8 - 8);
+	printf("movq %d(%%rbp), %%rax\n", - var * 8 - 8);
 }
 
 void compile_load_address(int var) {
-	printf("leaq %d(%%rsp), %%rax\n", - var * 8 - 8);
+	printf("leaq %d(%%rbp), %%rax\n", - var * 8 - 8);
 }
 
 void compile_load_const(int value) {
@@ -36,7 +36,7 @@ void compile_load_const(int value) {
 }
 
 void compile_add(int var) {
-	printf("addq %d(%%rsp), %%rax\n", - var * 8 - 8);
+	printf("addq %d(%%rbp), %%rax\n", - var * 8 - 8);
 }
 
 void compile_label(int label) {
