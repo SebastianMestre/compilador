@@ -195,7 +195,16 @@ int main(int argc, char** argv) {
 
 	char const* test_name = argv[1];
 
-	if (!strcmp(test_name, "fib")) {
+	if (!strcmp(test_name, "increment")) {
+		int arg = local_var_alloc++;
+
+		auto fun = Func{
+			"increment",
+			new Return{new Add{new Num{1}, new Var{arg}}}
+		};
+
+		compile(fun);
+	} else if (!strcmp(test_name, "fib")) {
 
 		int arg = local_var_alloc++;
 		int a = local_var_alloc++;
