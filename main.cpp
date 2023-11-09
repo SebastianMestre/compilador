@@ -182,6 +182,8 @@ void compile(Ast::Func const& a) {
 	printf("mov %%rdi, %%rax\n");
 	compile_store(0);
 
+	printf("add $%d, %%rsp\n", -8 * local_var_alloc);
+
 	compile(a.body());
 }
 
