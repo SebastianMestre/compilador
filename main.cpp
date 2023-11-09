@@ -64,7 +64,6 @@ void compile_deref() {
 	printf("mov (%%rax), %%rax\n");
 }
 
-int local_var_alloc = 0;
 int label_alloc = 0;
 
 void compile(Ast::Expr const& a) {
@@ -182,7 +181,7 @@ void compile(Ast::Func const& a) {
 	printf("mov %%rdi, %%rax\n");
 	compile_store(0);
 
-	printf("add $%d, %%rsp\n", -8 * local_var_alloc);
+	printf("add $%d, %%rsp\n", -8 * a.local_var_count());
 
 	compile(a.body());
 }
@@ -197,11 +196,14 @@ int main(int argc, char** argv) {
 
 	char const* test_name = argv[1];
 
+	int local_var_alloc = 0;
+
 	if (!strcmp(test_name, "increment")) {
 		int arg = local_var_alloc++;
 
 		auto fun = Func{
 			"increment",
+			1,
 			new Return{new Add{new Num{1}, new Var{arg}}}
 		};
 
@@ -227,18 +229,19 @@ int main(int argc, char** argv) {
 		// end
 		auto fun = Func{
 			"fib",
+			4,
+			new Seq{new Seq{new Seq{
+				new Assignment{a, new Num{0}},
+				new Assignment{b, new Num{1}}},
+			new  While{
+				new Var{arg},
 				new Seq{new Seq{new Seq{
-					new Assignment{a, new Num{0}},
-					new Assignment{b, new Num{1}}},
-				new  While{
-					new Var{arg},
-					new Seq{new Seq{new Seq{
-						new Assignment{c, new Add{new Var{a}, new Var{b}}},
-						new Assignment{a, new Var{b}}},
-					new Assignment{b, new Var{c}}},
-					new Assignment{arg, new Add{new Var{arg}, new Num{-1}}}}
-				}},
-				new Return{new Var{b}}}
+					new Assignment{c, new Add{new Var{a}, new Var{b}}},
+					new Assignment{a, new Var{b}}},
+				new Assignment{b, new Var{c}}},
+				new Assignment{arg, new Add{new Var{arg}, new Num{-1}}}}
+			}},
+			new Return{new Var{b}}}
 		};
 
 		compile(fun);
@@ -254,10 +257,11 @@ int main(int argc, char** argv) {
 		// return nxt_val
 		auto fun = Func{
 			"read_next_value",
-				new Seq{new Seq{
-					new Assignment{nxt, new Deref{new Add{new Var{arg}, new Num{8}}}},
-					new Assignment{nxt_val, new Deref{new Var{nxt}}}},
-				new Return{new Var{nxt_val}}}
+			3,
+			new Seq{new Seq{
+				new Assignment{nxt, new Deref{new Add{new Var{arg}, new Num{8}}}},
+				new Assignment{nxt_val, new Deref{new Var{nxt}}}},
+			new Return{new Var{nxt_val}}}
 		};
 #else
 
