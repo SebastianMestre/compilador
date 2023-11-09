@@ -178,8 +178,11 @@ void compile(Ast::Func const& a) {
 	printf("push %%rbp\n");
 	printf("mov %%rsp, %%rbp\n");
 
-	printf("mov %%rdi, %%rax\n");
-	compile_store(0);
+	char const* argument_regs[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+	for (int i = 0; i < a.argument_count(); ++i) {
+		printf("mov %%%s, %%rax\n", argument_regs[i]);
+		compile_store(i);
+	}
 
 	printf("add $%d, %%rsp\n", -8 * a.local_var_count());
 
@@ -203,7 +206,7 @@ int main(int argc, char** argv) {
 
 		auto fun = Func{
 			"increment",
-			1,
+			1, 1,
 			new Return{new Add{new Num{1}, new Var{arg}}}
 		};
 
@@ -229,7 +232,7 @@ int main(int argc, char** argv) {
 		// end
 		auto fun = Func{
 			"fib",
-			4,
+			4, 1,
 			new Seq{new Seq{new Seq{
 				new Assignment{a, new Num{0}},
 				new Assignment{b, new Num{1}}},
@@ -257,7 +260,7 @@ int main(int argc, char** argv) {
 		// return nxt_val
 		auto fun = Func{
 			"read_next_value",
-			3,
+			3, 1,
 			new Seq{new Seq{
 				new Assignment{nxt, new Deref{new Add{new Var{arg}, new Num{8}}}},
 				new Assignment{nxt_val, new Deref{new Var{nxt}}}},

@@ -159,20 +159,27 @@ private:
 };
 
 struct Func {
-	Func(std::string name, int local_var_count, Stmt* body)
+	Func(std::string name, int local_var_count, int argument_count, Stmt* body)
 	: m_name{std::move(name)}
 	, m_local_var_count{local_var_count}
+	, m_argument_count{argument_count}
 	, m_body{body} {
+		assert(local_var_count >= 0);
+		assert(argument_count >= 0);
+		assert(argument_count <= 6);
+		assert(argument_count <= local_var_count);
 		assert(body != nullptr);
 	}
 	std::string& name() { return m_name; }
 	int local_var_count() const { return m_local_var_count; }
+	int argument_count() const { return m_argument_count; }
 	Stmt& body() { return *m_body; }
 	std::string const& name() const { return m_name; }
 	Stmt const& body() const { return *m_body; }
 private:
 	std::string m_name;
 	int m_local_var_count;
+	int m_argument_count;
 	Stmt* m_body;
 };
 
