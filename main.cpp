@@ -120,9 +120,8 @@ void compile(Ast::Stmt const& a) {
 		compile_address(e.target());
 		printf("push %%rax\n");
 		compile(e.expr());
-		printf("movq %%rax, %%rcx\n");
-		printf("pop %%rax\n");
-		printf("movq %%rcx, (%%rax)\n");
+		printf("pop %%rcx\n");
+		printf("movq %%rax, (%%rcx)\n");
 	} break;
 	case Tag::Noop: {
 		// nothing to do
