@@ -65,7 +65,6 @@ void compile_deref() {
 }
 
 int local_var_alloc = 0;
-int tmp_alloc = 2;
 int label_alloc = 0;
 
 void compile(Ast::Expr const& a) {
@@ -74,10 +73,10 @@ void compile(Ast::Expr const& a) {
 	case Tag::Add: {
 		auto const& e = static_cast<Ast::Add const&>(a);
 		compile(e.lhs());
-		int lhs_var = tmp_alloc++;
-		compile_store(lhs_var);
+		printf("push %%rax\n");
 		compile(e.rhs());
-		compile_add(lhs_var);
+		printf("pop %%rcx\n");
+		printf("add %%rcx, %%rax\n");
 	} break;
 	case Tag::Num: {
 		auto const& e = static_cast<Ast::Num const&>(a);
@@ -118,13 +117,11 @@ void compile(Ast::Stmt const& a) {
 	switch(a.tag()) {
 	case Tag::Assignment: {
 		auto const& e = static_cast<Ast::Assignment const&>(a);
-		tmp_alloc = local_var_alloc;
 		compile_address(e.target());
-		int slot = tmp_alloc++;
-		compile_store(slot);
+		printf("push %%rax\n");
 		compile(e.expr());
 		printf("movq %%rax, %%rbx\n");
-		compile_load(slot);
+		printf("pop %%rax\n");
 		printf("movq %%rbx, (%%rax)\n");
 	} break;
 	case Tag::Noop: {
@@ -132,7 +129,6 @@ void compile(Ast::Stmt const& a) {
 	} break;
 	case Tag::IfElse: {
 		auto const& e = static_cast<Ast::IfElse const&>(a);
-		tmp_alloc = local_var_alloc;
 		compile(e.condition());
 		int false_label = label_alloc++;
 		int end_label = label_alloc++;
@@ -145,7 +141,6 @@ void compile(Ast::Stmt const& a) {
 	} break;
 	case Tag::While: {
 		auto const& e = static_cast<Ast::While const&>(a);
-		tmp_alloc = local_var_alloc;
 		int start_label = label_alloc++;
 		int end_label = label_alloc++;
 		compile_label(start_label);
@@ -157,7 +152,6 @@ void compile(Ast::Stmt const& a) {
 	} break;
 	case Tag::Return: {
 		auto const& e = static_cast<Ast::Return const&>(a);
-		tmp_alloc = local_var_alloc;
 		compile(e.expr());
 
 		printf("mov %%rbp, %%rsp\n");
