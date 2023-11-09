@@ -159,6 +159,9 @@ void compile(Ast::Stmt const& a) {
 		auto const& e = static_cast<Ast::Return const&>(a);
 		tmp_alloc = local_var_alloc;
 		compile(e.expr());
+
+		printf("mov %%rbp, %%rsp\n");
+		printf("pop %%rbp\n");
 		compile_return();
 	} break;
 	case Tag::Seq: {
@@ -173,8 +176,12 @@ void compile(Ast::Func const& a) {
 	printf(".global %s\n", a.name().c_str());
 	compile_named_label(a.name());
 
+	printf("push %%rbp\n");
+	printf("mov %%rsp, %%rbp\n");
+
 	printf("mov %%rdi, %%rax\n");
 	compile_store(0);
+
 	compile(a.body());
 }
 
