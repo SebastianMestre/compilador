@@ -201,7 +201,26 @@ int main(int argc, char** argv) {
 
 	int local_var_alloc = 0;
 
-	if (!strcmp(test_name, "increment")) {
+	if (!strcmp(test_name, "swap")) {
+
+		int arg1 = local_var_alloc++;
+		int arg2 = local_var_alloc++;
+		int temp = local_var_alloc++;
+
+		auto fun = Func{
+			"swap",
+			3, 2,
+			new Seq{new Seq{new Seq{
+			new Assignment{new Var{temp}, new Deref{new Var{arg1}}},
+			new Assignment{new Deref{new Var{arg1}}, new Deref{new Var{arg2}}}},
+			new Assignment{new Deref{new Var{arg2}}, new Var{temp}}},
+			new Return{new Num{0}}}
+		};
+
+		compile(fun);
+
+
+	} else if (!strcmp(test_name, "increment")) {
 		int arg = local_var_alloc++;
 
 		auto fun = Func{
