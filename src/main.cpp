@@ -19,50 +19,17 @@
 // resultado queda en %rax, que cumple el rol de acumulador. Si hace falta
 // guardamos los resultados intermedios en la pila.
 
-void compile_store(int var) {
-	printf("movq %%rax, %d(%%rbp)\n", - var * 8 - 8);
-}
-
-void compile_load(int var) {
-	printf("movq %d(%%rbp), %%rax\n", - var * 8 - 8);
-}
-
-void compile_load_address(int var) {
-	printf("leaq %d(%%rbp), %%rax\n", - var * 8 - 8);
-}
-
-void compile_load_const(int value) {
-	printf("movq $%d, %%rax\n", value);
-}
-
-void compile_add(int var) {
-	printf("addq %d(%%rbp), %%rax\n", - var * 8 - 8);
-}
-
-void compile_label(int label) {
-	printf("L%d:\n", label);
-}
-
-void compile_jump(int label) {
-	printf("jmp L%d\n", label);
-}
-
-void compile_jump_if_zero(int label) {
-	printf("test %%rax, %%rax\n");
-	printf("jz L%d\n", label);
-}
-
-void compile_named_label(std::string const& s) {
-	printf("%s:\n", s.c_str());
-}
-
-void compile_return() {
-	printf("ret\n");
-}
-
-void compile_deref() {
-	printf("mov (%%rax), %%rax\n");
-}
+void compile_store(int var)                    { printf("movq %%rax, %d(%%rbp)\n", - var * 8 - 8); }
+void compile_load(int var)                     { printf("movq %d(%%rbp), %%rax\n", - var * 8 - 8); }
+void compile_load_address(int var)             { printf("leaq %d(%%rbp), %%rax\n", - var * 8 - 8); }
+void compile_load_const(int value)             { printf("movq $%d, %%rax\n", value); }
+void compile_add(int var)                      { printf("addq %d(%%rbp), %%rax\n", - var * 8 - 8); }
+void compile_label(int label)                  { printf("L%d:\n", label); }
+void compile_jump(int label)                   { printf("jmp L%d\n", label); }
+void compile_jump_if_zero(int label)           { printf("test %%rax, %%rax\n"); printf("jz L%d\n", label); }
+void compile_named_label(std::string const& s) { printf("%s:\n", s.c_str()); }
+void compile_return()                          { printf("ret\n"); }
+void compile_deref()                           { printf("mov (%%rax), %%rax\n"); }
 
 int label_alloc = 0;
 
