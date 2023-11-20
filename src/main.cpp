@@ -78,6 +78,7 @@ void compile_address(Ast::Expr const& a) {
 	}
 }
 
+char const* current_function = nullptr;
 void compile(Ast::Stmt const& a) {
 	using Tag = Ast::Stmt::Tag;
 	switch(a.tag()) {
@@ -125,10 +126,7 @@ void compile(Ast::Stmt const& a) {
 	case Tag::Return: {
 		auto const& e = static_cast<Ast::Return const&>(a);
 		compile(e.expr());
-
-		printf("mov %%rbp, %%rsp\n");
-		printf("pop %%rbp\n");
-		compile_return();
+		printf("jmp %s_epilog\n", current_function);
 	} break;
 	case Tag::Seq: {
 		auto const& e = static_cast<Ast::Seq const&>(a);
@@ -153,7 +151,15 @@ void compile(Ast::Func const& a) {
 
 	printf("add $%d, %%rsp\n", -8 * a.local_var_count());
 
+	current_function = a.name().c_str();
 	compile(a.body());
+	printf("%s_epilog:\n", a.name().c_str());
+
+	printf("mov %%rbp, %%rsp\n");
+	printf("pop %%rbp\n");
+	printf("ret\n");
+
+	current_function = nullptr;
 }
 
 int main(int argc, char** argv) {
