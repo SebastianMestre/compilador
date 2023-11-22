@@ -19,6 +19,8 @@
 // resultado queda en %rax, que cumple el rol de acumulador. Si hace falta
 // guardamos los resultados intermedios en la pila.
 
+char const* argument_regs[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+
 void compile_store(int var)                    { printf("movq %%rax, %d(%%rbp)\n", - var * 8 - 8); }
 void compile_load(int var)                     { printf("movq %d(%%rbp), %%rax\n", - var * 8 - 8); }
 void compile_load_address(int var)             { printf("leaq %d(%%rbp), %%rax\n", - var * 8 - 8); }
@@ -56,6 +58,18 @@ void compile(Ast::Expr const& a) {
 		auto const& e = static_cast<Ast::Deref const&>(a);
 		compile(e.expr());
 		compile_deref();
+	} break;
+	case Tag::Call: {
+		auto const& e = static_cast<Ast::Call const&>(a);
+		size_t count = e.args().size();
+		for (size_t i = 0; i < count; ++i) {
+			compile(*e.args()[i]);
+			printf("push %%rax\n");
+		}
+		for (size_t i = count-1; i < count; --i) {
+			printf("pop %%%s\n", argument_regs[i]);
+		}
+		printf("call %s\n", e.symbol().c_str());
 	} break;
 	}
 }
@@ -143,7 +157,6 @@ void compile(Ast::Func const& a) {
 	printf("push %%rbp\n");
 	printf("mov %%rsp, %%rbp\n");
 
-	char const* argument_regs[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 	for (int i = 0; i < a.argument_count(); ++i) {
 		printf("mov %%%s, %%rax\n", argument_regs[i]);
 		compile_store(i);

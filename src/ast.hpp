@@ -1,13 +1,15 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <span>
 
 #include <cassert>
 
 namespace Ast {
 
 struct Expr {
-	enum class Tag { Add, Var, Num, Deref };
+	enum class Tag { Add, Var, Num, Deref, Call };
 	Expr(Tag tag) : m_tag{tag} {}
 	Tag tag() const { return m_tag; }
 private:
@@ -53,6 +55,24 @@ struct Deref : Expr {
 	Expr const& expr() const { return *m_expr; }
 private:
 	Expr* m_expr;
+};
+
+struct Call : Expr {
+	Call(std::string symbol, std::vector<Expr*> args)
+	: Expr{Tag::Call}
+	, m_symbol{std::move(symbol)}
+	, m_args{std::move(args)}
+	{
+		assert(args.size() <= 6);
+		for (auto arg : args) assert(arg != nullptr);
+	}
+	std::string& symbol() { return m_symbol; }
+	std::vector<Expr*>& args() { return m_args; }
+	std::span<Expr* const> args() const { return m_args; }
+	std::string const& symbol() const { return m_symbol; }
+private:
+	std::string m_symbol;
+	std::vector<Expr*> m_args;
 };
 
 struct Stmt {
