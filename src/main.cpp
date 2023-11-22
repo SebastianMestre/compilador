@@ -19,7 +19,28 @@ int main(int argc, char** argv) {
 
 	int local_var_alloc = 0;
 
-	if (!strcmp(test_name, "swap")) {
+	if (!strcmp(test_name, "fibrec")) {
+		int arg1 = local_var_alloc++;
+
+		auto fun = Func{
+			"fibrec", 1, 1,
+			new IfElse{
+				new Var{arg1},
+				new IfElse{
+					new Add{new Var{arg1}, new Num{-1}},
+					new Return{new Add{
+						new Call{"fibrec", {new Add{new Var{arg1}, new Num{-1}}}},
+						new Call{"fibrec", {new Add{new Var{arg1}, new Num{-2}}}}
+					}},
+					new Return{new Num{1}}
+				},
+				new Return{new Num{0}}
+			}
+		};
+
+		compile(fun);
+
+	} else if (!strcmp(test_name, "swap")) {
 
 		int arg1 = local_var_alloc++;
 		int arg2 = local_var_alloc++;
